@@ -7,8 +7,8 @@ public class Main{
         System.out.println("Escolha uma opção: ");
         System.out.println("1: Entrar no sistema");
         System.out.println("2: Cadastrar-se no sistema");
-        System.out.println("3: Listar usuários cadastrados");
-        System.out.println("4: Sair");
+        System.out.println("3: Sair");
+        System.out.print("Sua opção: ");
     }
 
     public static void main(String[] args){
@@ -34,12 +34,12 @@ public class Main{
                 break;
 
             case 3:
-                gerenciador.ListarUsers();
-                break;
-
-            case 4:
-                System.out.println("Encerrando o programa.");
+                System.out.println("Salvando dados e encerrando o programa...");
                 break;   
+
+            case 10:
+                gerenciador.listarTodosUsuarios();
+                break;     
 
             default:
             System.out.println("Opção inválida. Tente novamente.");
@@ -47,5 +47,6 @@ public class Main{
         }
     } while(escolha != 4);
     sc.close();
+    System.out.println("Programa encerrado.");
     }
 }

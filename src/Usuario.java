@@ -6,9 +6,6 @@ public class Usuario {
     LocalDate dataNascimento;
     String nomeCompleto;
     String email;
-    int diaN;
-    int mesN;
-    int anoN;
 
     public Usuario(String user, String senha, LocalDate dataNascimento, String nomeCompleto, String email){
         this.user = user;
@@ -28,5 +25,29 @@ public class Usuario {
     
     public String getUser(){
             return this.user;
+    }
+
+    public String getSenha() {
+        return this.senha;
+    }
+
+    public LocalDate getDataNascimento() {
+        return this.dataNascimento;
+    }
+
+    public String getNomeCompleto() {
+        return this.nomeCompleto;
+    }
+
+    public String getEmail() {
+        return this.email;
+    }
+    
+    public void info() {
+        System.out.println("Nome: " + this.nomeCompleto);
+        System.out.println("Email: " + this.email);
+        System.out.println("Data de Nascimento: " + this.dataNascimento);
+        System.out.println("Login: " + this.user);
+        System.out.println("Senha: " + this.senha);
     }
 }
