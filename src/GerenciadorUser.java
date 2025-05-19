@@ -10,13 +10,14 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
-public class Gerenciador {
+
+public class GerenciadorUser {
     Scanner sc;
     private List<Usuario> listadeUsuarios;
     private static final String users = "usuarios.data";
     private static final DateTimeFormatter FORMATADOR_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    public Gerenciador (Scanner sc){
+    public GerenciadorUser (Scanner sc){
     this.listadeUsuarios = new ArrayList<>();
     this.sc = sc;
     carregarUsuariosDeArquivo();
@@ -44,7 +45,7 @@ public class Gerenciador {
             }
         }
         
-        System.out.print("Cadastre seu login: ");
+        System.out.print("Cadastre seu nome de usuário: ");
         String login = sc.nextLine();
 
         System.out.print("Cadastre sua senha: ");
@@ -54,6 +55,36 @@ public class Gerenciador {
         this.listadeUsuarios.add(novoUsuario);
         salvarUsuariosEmArquivo();
         System.out.println("\nUsuário cadastrado com sucesso!");
+    }
+
+    public boolean login() {
+        System.out.print("Digite seu nome de usuário: ");
+        String loginInput = sc.nextLine();
+
+        System.out.print("Digite sua senha: ");
+        String senhaInput = sc.nextLine();
+
+        Usuario usuarioAutenticado = this.validarLogin(loginInput, senhaInput);
+
+        if (usuarioAutenticado != null) {
+            System.out.println("Login bem-sucedido! Bem-vindo!");
+            return true;
+        } else {
+            System.out.println("Login ou senha inválidos.");
+            return false;
+        }
+    }
+
+    public Usuario validarLogin(String loginTentativa, String senhaTentativa) {
+        if (loginTentativa == null || senhaTentativa == null) {
+            return null;
+        }
+        for (Usuario usuario : this.listadeUsuarios) {
+            if (usuario.getUser().equals(loginTentativa) && usuario.getSenha().equals(senhaTentativa)) {
+                return usuario;
+            }
+        }
+        return null;
     }
 
     public void listarTodosUsuarios() {
