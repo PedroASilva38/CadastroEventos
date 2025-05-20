@@ -9,18 +9,24 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class GerenciadorUser {
     Scanner sc;
     private List<Usuario> listadeUsuarios;
-    private static final String users = "users.data";
+    private static final String users_file_path = "users.data";
     private static final DateTimeFormatter FORMATADOR_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private Usuario usuarioLogado;
 
     public GerenciadorUser (Scanner sc){
-    this.listadeUsuarios = new ArrayList<>();
-    this.sc = sc;
-    carregarUsuariosDeArquivo();
+        this.listadeUsuarios = new ArrayList<>();
+        this.sc = sc;
+        carregarUsuariosDeArquivo();
+    }
+
+    public Usuario getUsuarioLogado() {
+        return usuarioLogado;
     }
 
     public void CadastroUsuario() {
@@ -47,13 +53,19 @@ public class GerenciadorUser {
         
         System.out.print("Cadastre seu nome de usuário: ");
         String login = sc.nextLine();
+        for (Usuario u : listadeUsuarios) {
+            if (u.getUser().equalsIgnoreCase(login)) {
+                System.out.println("Este nome de usuário já existe. Por favor, escolha outro.");
+                return; 
+            }
+        }
 
         System.out.print("Cadastre sua senha: ");
         String senha = sc.nextLine();
 
         Usuario novoUsuario = new Usuario(login, senha, dataNascimento, nomeCompleto, email);
         this.listadeUsuarios.add(novoUsuario);
-        salvarUsuariosEmArquivo();
+        salvarUsuariosEmArquivo(); 
         System.out.println("\nUsuário cadastrado com sucesso!");
     }
 
@@ -67,11 +79,23 @@ public class GerenciadorUser {
         Usuario usuarioAutenticado = this.validarLogin(loginInput, senhaInput);
 
         if (usuarioAutenticado != null) {
-            System.out.println("Login bem-sucedido! Bem-vindo!");
+            this.usuarioLogado = usuarioAutenticado; 
+            System.out.println("Login bem-sucedido! Bem-vindo, " + usuarioAutenticado.getNomeCompleto() + "!");
             return true;
         } else {
+            this.usuarioLogado = null; 
             System.out.println("Login ou senha inválidos.");
             return false;
+        }
+    }
+
+    public void logout() {
+        if (this.usuarioLogado != null) {
+            System.out.println("Usuário " + this.usuarioLogado.getUser() + " deslogado.");
+            salvarUsuariosEmArquivo(); 
+            this.usuarioLogado = null;
+        } else {
+            System.out.println("Nenhum usuário estava logado.");
         }
     }
 
@@ -100,38 +124,43 @@ public class GerenciadorUser {
     }
 
     public void salvarUsuariosEmArquivo() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(users))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(users_file_path))) {
             for (Usuario usuario : listadeUsuarios) {
+                String eventosConfirmadosStr = String.join(",", usuario.getNomesEventosConfirmados());
+                if (eventosConfirmadosStr.isEmpty()) {
+                    eventosConfirmadosStr = "NENHUM"; 
+                }
+
                 String linha = String.join(";",
                         usuario.getUser(),
                         usuario.getSenha(),
                         usuario.getDataNascimento().format(FORMATADOR_DATA),
                         usuario.getNomeCompleto(),
-                        usuario.getEmail());
+                        usuario.getEmail(),
+                        eventosConfirmadosStr 
+                );
                 writer.write(linha);
                 writer.newLine();
             }
-            System.out.println("Usuários salvos em " + users);
         } catch (IOException e) {
             System.err.println("Erro ao salvar usuários no arquivo: " + e.getMessage());
         }
     }
 
     public void carregarUsuariosDeArquivo() {
-        File arquivo = new File(users);
+        File arquivo = new File(users_file_path);
         if (!arquivo.exists()) {
-            System.out.println("Arquivo de usuários (" + users + ") não encontrado. Começando com lista vazia.");
             return;
         }
-        try (BufferedReader reader = new BufferedReader(new FileReader(users))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(users_file_path))) {
             String linha;
             this.listadeUsuarios.clear();
 
             while ((linha = reader.readLine()) != null) {
                 if (linha.trim().isEmpty()) continue;
 
-                String[] dados = linha.split(";", -1);
-                if (dados.length == 5) {
+                String[] dados = linha.split(";", -1); 
+                if (dados.length >= 5) { 
                     try {
                         String login = dados[0];
                         String senha = dados[1];
@@ -140,6 +169,11 @@ public class GerenciadorUser {
                         String email = dados[4];
 
                         Usuario usuario = new Usuario(login, senha, dataNascimento, nomeCompleto, email);
+
+                        if (dados.length > 5 && dados[5] != null && !dados[5].isEmpty() && !dados[5].equals("NENHUM")) {
+                            List<String> nomesEventos = new ArrayList<>(Arrays.asList(dados[5].split(",")));
+                            usuario.setNomesEventosConfirmados(nomesEventos);
+                        }
                         this.listadeUsuarios.add(usuario);
                     } catch (DateTimeParseException e) {
                         System.err.println("Erro ao converter data para o usuário na linha: '" + linha + "'. Pulando. Detalhe: " + e.getMessage());
@@ -147,10 +181,9 @@ public class GerenciadorUser {
                         System.err.println("Erro ao processar linha do arquivo de usuários: '" + linha + "'. Pulando. Detalhe: " + e.getMessage());
                     }
                 } else {
-                    System.err.println("Linha malformada no arquivo de usuários (esperava 5 campos, obteve " + dados.length + "): '" + linha + "'. Pulando.");
+                    System.err.println("Linha malformada no arquivo de usuários (esperava pelo menos 5 campos): '" + linha + "'. Pulando.");
                 }
             }
-            System.out.println(this.listadeUsuarios.size() + " usuários carregados de " + users);
         } catch (IOException e) {
             System.err.println("Erro ao carregar usuários do arquivo: " + e.getMessage());
         }

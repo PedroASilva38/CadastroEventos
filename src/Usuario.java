@@ -1,5 +1,7 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Usuario {
     String user;
@@ -7,6 +9,7 @@ public class Usuario {
     LocalDate dataNascimento;
     String nomeCompleto;
     String email;
+    private List<String> nomesEventosConfirmados;
 
     public Usuario(String user, String senha, LocalDate dataNascimento, String nomeCompleto, String email){
         this.user = user;
@@ -14,6 +17,7 @@ public class Usuario {
         this.dataNascimento = dataNascimento;
         this.nomeCompleto = nomeCompleto;
         this.email = email;
+        this.nomesEventosConfirmados = new ArrayList<>();
     }
 
     public String getDataNascimentoFormatada() {
@@ -47,8 +51,34 @@ public class Usuario {
     public void info() {
         System.out.println("Nome: " + this.nomeCompleto);
         System.out.println("Email: " + this.email);
-        System.out.println("Data de Nascimento: " + this.dataNascimento);
+        System.out.println("Data de Nascimento: " + getDataNascimentoFormatada());
         System.out.println("Login: " + this.user);
-        System.out.println("Senha: " + this.senha);
+        if (!nomesEventosConfirmados.isEmpty()) {
+            System.out.println("Eventos Confirmados (Nomes): " + String.join(", ", nomesEventosConfirmados));
+        } else {
+            System.out.println("Nenhum evento confirmado.");
+        }
+    }
+
+    public List<String> getNomesEventosConfirmados() {
+        return new ArrayList<>(this.nomesEventosConfirmados);
+    }
+
+    public void confirmarPresenca(String nomeEvento) {
+        if (nomeEvento != null && !nomeEvento.isEmpty() && !this.nomesEventosConfirmados.contains(nomeEvento)) {
+            this.nomesEventosConfirmados.add(nomeEvento);
+        }
+    }
+
+    public void cancelarPresenca(String nomeEvento) {
+        this.nomesEventosConfirmados.remove(nomeEvento);
+    }
+
+    public boolean estaConfirmado(String nomeEvento) {
+        return this.nomesEventosConfirmados.contains(nomeEvento);
+    }
+
+    void setNomesEventosConfirmados(List<String> nomesEventos) {
+        this.nomesEventosConfirmados = new ArrayList<>(nomesEventos);
     }
 }

@@ -21,7 +21,7 @@ public class ConsultaViaCep {
                 .GET()
                 .build();
 
-        System.out.println("Consultando CEP na API: " + cep + "...");
+        System.out.println("Consultando CEP: " + cep + "...");
 
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
