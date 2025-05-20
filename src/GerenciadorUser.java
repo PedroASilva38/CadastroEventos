@@ -14,7 +14,7 @@ import java.util.Scanner;
 public class GerenciadorUser {
     Scanner sc;
     private List<Usuario> listadeUsuarios;
-    private static final String users = "usuarios.data";
+    private static final String users = "users.data";
     private static final DateTimeFormatter FORMATADOR_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public GerenciadorUser (Scanner sc){

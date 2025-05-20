@@ -43,7 +43,6 @@ public class Main{
         }
         switch (escolha) {
             case 1:
-                gerenciadorUser.login();
                 if (gerenciadorUser.login() == true){
                     do {
                         exibirMenuEventos();
@@ -54,8 +53,8 @@ public class Main{
                             System.out.println("Opção inválida. Tente novamente.");
                         }
                         switch (escolhaE) {
-                            case 1:
-                                
+                            case 6:
+                                gerenciadorEventos.CadastroEvento();
                                 break;
                         
                             default:
